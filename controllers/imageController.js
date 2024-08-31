@@ -4,6 +4,17 @@ const axios = require('axios');
 const sharp = require('sharp');
 const fs = require('fs');
 
+const getAllRequests = async (req, res) => {
+  try {
+    const requests = await ImageRequest.find({});
+    res.status(200).json(requests);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({ message: 'Server error.' });
+  }
+};
+
 const uploadCSV = async (req, res) => {
   try {
     const file = req.file;
@@ -11,7 +22,7 @@ const uploadCSV = async (req, res) => {
       return res.status(400).json({ message: 'Please upload a CSV file.' });
     }
 
-    
+
     const parsedData = parseCSV(file.path);
     if (!parsedData) {
       return res.status(400).json({ message: 'Invalid CSV format.' });
@@ -25,7 +36,7 @@ const uploadCSV = async (req, res) => {
     });
     await newRequest.save();
 
-   
+
     processImagesAsync(requestId);
 
     res.status(200).json({ requestId });
@@ -51,11 +62,11 @@ const checkStatus = async (req, res) => {
 
 
 const parseCSV = (filePath) => {
-  
+
   return [
     { serialNumber: 1, productName: 'SKU1', inputImageUrls: ['https://example.com/img1.jpg'] },
-    
+
   ];
 };
 
-module.exports = { uploadCSV, checkStatus };
+module.exports = { uploadCSV, checkStatus, getAllRequests };
